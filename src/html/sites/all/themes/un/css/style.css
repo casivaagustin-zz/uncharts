@@ -38,3 +38,36 @@ h1.page-header {
 .money {
     font-weight: bold;
 }
+
+.relief-item {
+    text-align: center;
+}
+
+.relief-item .title {
+    font-weight:bold;
+    color: #1D5CB1;
+    margin-bottom: 10px;
+    min-height: 100px;
+}
+
+
+.thumb img {
+    display: block;
+    max-width: 80%;
+    max-height: 100px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+.thumb {
+    min-height: 100px;
+    overflow: hidden;
+}
+
+.seemore {
+    border: 1px solid #1D5CB1;
+    border-radius: 10px;
+    padding: 5px;
+    width: 50%;
+    margin: 0 auto;
+}

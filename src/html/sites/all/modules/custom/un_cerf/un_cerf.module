@@ -61,6 +61,12 @@ function un_cerf_theme($existing, $type, $theme, $path) {
         'data' => array(),
       ),
     ),
+    'un_cerf_relief' => array(
+      'template' => 'templates/un_cerf_relief',
+      'variables' => array(
+        'data' => array(),
+      ),
+    ),
   );
 }
 
