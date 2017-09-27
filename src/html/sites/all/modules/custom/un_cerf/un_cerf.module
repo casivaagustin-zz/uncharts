@@ -1,0 +1,138 @@
+<?php
+
+function un_cerf_block_info() {
+  $blocks['un_cerf_filters'] = array(
+    'info' => t('Cerf Founding Filter'),
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function un_cerf_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'un_cerf_filters':
+      $block['content'] = un_cerf_block_filter_content();
+      break;
+  }
+
+  return $block;
+}
+
+function un_cerf_theme($existing, $type, $theme, $path) {
+  return array(
+    'un_cerf_form_filter' => array(
+      'template' => 'templates/un_cerf_form_filter',
+      'variables' => array(
+        'vars' => array(),
+      ),
+    ),
+    'un_cerf_map' => array(
+      'template' => 'templates/un_cerf_map',
+      'variables' => array(
+        'data' => array(),
+      ),
+    ),
+    'un_cerf_summary' => array(
+      'template' => 'templates/un_cerf_summary',
+      'variables' => array(
+        'data' => array(),
+      ),
+    ),
+    'un_cerf_by_year' => array(
+      'template' => 'templates/un_cerf_by_year',
+      'variables' => array(
+        'data' => array(),
+      ),
+    ),
+    'un_cerf_by_emergency' => array(
+      'template' => 'templates/un_cerf_by_emergency',
+      'variables' => array(
+        'data' => array(),
+      ),
+    ),
+    'un_cerf_by_year_and_country' => array(
+      'template' => 'templates/un_cerf_by_year_and_country',
+      'variables' => array(
+        'data' => array(),
+      ),
+    ),
+  );
+}
+
+
+function un_cerf_block_filter_content() {
+  return theme('un_cerf_form_filter', array());
+}
+
+function un_cerf_get_project_all() {
+  $cached_response = cache_get('un_cerf_all');
+  if (empty($cached_response)) {
+    $response = drupal_http_request('http://35.167.145.172/ochasite/controllers/getChartValuesController.php?year=2013&windowID=All&agencyID=All&sectorID=All&emergencyID=All&countryID=All', array('timeout' => (60*3)));
+    cache_set('un_cerf_all', $response);
+  }
+  else {
+    $response = $cached_response->data;
+  }
+
+  return json_decode($response->data);
+}
+
+function un_cerf_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins';
+  }
+}
+
+function un_cerf_get($url, $oprions) {
+  $cached_response = cache_get('un_cerf_all');
+  if (empty($cached_response)) {
+    $response = drupal_http_request('http://35.167.145.172/ochasite/controllers/getChartValuesController.php?year=2013&windowID=All&agencyID=All&sectorID=All&emergencyID=All&countryID=All', array('timeout' => (60*3)));
+    cache_set('un_cerf_all', $response);
+  }
+  else {
+    $response = $cached_response->data;
+  }
+
+  return json_decode($response->data);
+}
+
+function un_cerf_process_filters() {
+  $filters = array(
+    'year' => 'All',
+    'windowID' => 'All',
+    'agencyID' => 'All',
+    'sectorID' => 'All',
+    'emergency' => 'All',
+    'emergencyID' => 'All',
+    'countryID' => 'All',
+  );
+  if (!empty($_SESSION['filters'])) {
+    $filters = $_SESSION['filters'];
+  }
+
+  return http_build_query($filters);
+}
+
+/**
+ * Gets data from the source and cache its in order to avoid multiple
+ * requests to the same.
+ *
+ * @param $filters
+ *
+ * @return null|object
+ */
+function uc_cerf_get_chart_values($filters) {
+  static $current_data = NULL;
+
+  if (empty($current_data)) {
+    $url = 'http://35.167.145.172/ochasite/controllers/getChartValuesController.php?' . $filters;
+    $current_data = drupal_http_request($url, array('timeout' => (60*3)));
+  }
+
+  return $current_data;
+}
